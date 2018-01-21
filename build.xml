@@ -1,0 +1,56 @@
+<project name="FacadeTest" default="help">
+	
+	<property environment="env"/>
+	<path id="test.classpath">
+		<pathelement path= "${env.JUNIT}" />
+		<pathelement path="${env.HAMCREST_CORE}" />
+		<pathelement path="bin" />
+	</path>
+	
+	<target name="help" description="Project Help"> 
+		<java classname="org.apache.tools.ant.Main"> 
+			<arg value="-projecthelp" /> 
+			<arg value="-buildfile" /> 
+			<arg value="build.xml" /> 
+		</java> 
+	</target>
+	
+	
+    <target name="clean" description="Delete Build Directories">
+        <delete dir="bin"/>
+    	<delete dir="test/bin" />
+    </target>
+
+	<target name="init" depends="clean" description="Create Build Directories">
+		<mkdir dir="bin" />
+		<mkdir dir="test/bin" />
+	</target>
+	
+    <target name="shell-compile" depends="init" description="Compile shell source files">
+        <javac srcdir="src" destdir="bin"/>
+    </target>
+	
+    <target name="shelltest-compile" depends="shell-compile" description="Compile shell Tests">
+        <javac srcdir="test/src" destdir="test/bin">
+    		<classpath refid="test.classpath" />
+        </javac>
+    </target>
+	<target name="shell-run" depends="shell-compile" description="Run shell">
+		<java classname= "edu.umb.cs.cs680.hw11.Shell" classpath="bin" fork="true">
+		</java>
+	</target>
+	<target name="test" depends="shell-compile,shelltest-compile" description="Run Tests">
+	    <junit printsummary="on" haltonfailure="yes" fork="true">
+	        <classpath>
+	          <path refid="test.classpath"/>
+	          <pathelement location="test/bin"/>
+	        </classpath>
+	        <formatter type="brief" usefile="false" />
+	        <batchtest>
+	            <fileset dir="test/src" includes="**/*Test.java" />
+	        </batchtest>
+	    </junit>
+	  </target>
+	
+	
+</project>
